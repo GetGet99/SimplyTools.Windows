@@ -1,7 +1,7 @@
 ﻿// source: https://github.com/dongle-the-gadget/SystemBackdropTypes/blob/master/SystemBackdropTypes/PInvoke.cs
 using System.Runtime.InteropServices;
 
-namespace SimpleTools.WPF;
+namespace SimplyTools.WPF;
 
 public class PInvoke
 {

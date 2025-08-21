@@ -1,9 +1,11 @@
 ﻿extern alias wv2;
 
 using Microsoft.UI.Windowing;
+using System.IO;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using Windows.ApplicationModel;
 using Windows.UI.ViewManagement;
 using WinWrapper.Windowing;
 using wv2::Microsoft.Web.WebView2.Core;
@@ -11,7 +13,7 @@ using wv2::Microsoft.Web.WebView2.Wpf;
 using Win = WinWrapper.Windowing.Window;
 using Window = System.Windows.Window;
 
-namespace SimpleTools.WPF;
+namespace SimplyTools.WPF;
 
 public partial class MainWindow : Window
 {
@@ -92,17 +94,22 @@ public partial class MainWindow : Window
         }
 
         await webView.EnsureCoreWebView2Async();
-        webView.CoreWebView2.Settings.UserAgent = $"SimpleTools/Windows {webView.CoreWebView2.Settings.UserAgent}";
+        webView.CoreWebView2.Settings.UserAgent = $"SimplyTools/Windows {webView.CoreWebView2.Settings.UserAgent}";
         webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
         webView.CoreWebView2.Settings.IsZoomControlEnabled = false;
         webView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
         webView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false;
         webView.CoreWebView2.Settings.IsSwipeNavigationEnabled = false;
         webView.CoreWebView2.Settings.IsPinchZoomEnabled = false;
-        webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+        webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
+#if !DEBUG
         webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
-        webView.CoreWebView2.SetVirtualHostNameToFolderMapping("simpletools.local", "./Assets/web", CoreWebView2HostResourceAccessKind.Allow);
-        webView.CoreWebView2.Navigate("http://simpletools.local/index.html");
+#endif
+        Directory.SetCurrentDirectory(Package.Current.InstalledLocation.Path);
+        webView.CoreWebView2.SetVirtualHostNameToFolderMapping("SimplyTools.local",
+            "./Assets/web",
+            CoreWebView2HostResourceAccessKind.Allow);
+        webView.CoreWebView2.Navigate("http://SimplyTools.local/index.html");
         webView.NavigationCompleted += async (s, e) =>
         {
             if (e.IsSuccess)

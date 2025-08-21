@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace SimpleTools.WPF
+namespace SimplyTools.WPF
 {
     /// <summary>
     /// Interaction logic for App.xaml
