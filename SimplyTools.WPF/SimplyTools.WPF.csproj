@@ -18,6 +18,9 @@
 		<PackageReference Include="WinWrapper.Windowing" Version="2.0.2" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Page Include="MainWindow.xaml" />
+	</ItemGroup>
+	<ItemGroup>
 	  <None Update="Assets\web\**">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
