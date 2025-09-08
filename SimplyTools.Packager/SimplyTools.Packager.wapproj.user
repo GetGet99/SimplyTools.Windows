@@ -1,4 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup />
+  <PropertyGroup>
+    <Source>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</Source>
+    <SmallTileSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</SmallTileSource>
+    <MediumTileSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</MediumTileSource>
+    <WideTileSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</WideTileSource>
+    <LargeTileSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</LargeTileSource>
+    <AppIconSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</AppIconSource>
+    <SplashScreenSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</SplashScreenSource>
+    <PackageLogoSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</PackageLogoSource>
+  </PropertyGroup>
 </Project>

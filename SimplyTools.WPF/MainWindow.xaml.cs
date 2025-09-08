@@ -166,7 +166,7 @@ public partial class MainWindow : Window
                 var src = webView.CoreWebView2.Source;
 #if DEBUG
                 if (src.StartsWith("http://localhost:3000/"))
-                    webView.CoreWebView2.Navigate($"https://simplytools.local/{src["http://localhost:3000/".Length..]}");
+                    webView.CoreWebView2.Navigate($"https://getget99.github.io/SimplyTools/{src["http://localhost:3000/".Length..]}");
 #endif
                 if (src is "https://simplytools.local/" or "https://simplytools.local")
                     webView.CoreWebView2.Navigate("https://simplytools.local/index.html");

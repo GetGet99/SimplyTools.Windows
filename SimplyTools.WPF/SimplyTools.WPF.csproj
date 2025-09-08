@@ -9,6 +9,17 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Assets\SimplyToolsIcon1.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Assets\SimplyToolsIcon1.ico">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 	<ItemGroup>
 
 		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2535.41">
