@@ -1,0 +1,18 @@
+name: 'Example: Orders'
+description: Example Snippet
+properties:
+  customer_name: string
+  order_items:
+    - name: string
+      price: number
+  total_price: number
+example:
+  customer_name: Alice
+  total_price: 42
+  order_items:
+    - name: "Book"
+      price: 12
+    - name: "Pen"
+      price: 5
+    - name: "Bag"
+      price: 25

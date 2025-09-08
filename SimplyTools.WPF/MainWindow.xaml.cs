@@ -1,11 +1,17 @@
 ﻿extern alias wv2;
 
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
+using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Web;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Windows.ApplicationModel;
+using Windows.Graphics;
 using Windows.UI.ViewManagement;
 using WinWrapper.Windowing;
 using wv2::Microsoft.Web.WebView2.Core;
@@ -33,6 +39,11 @@ public partial class MainWindow : Window
 
         Content = webView;
 
+        //Loaded += delegate
+        //{
+        //    incps = InputNonClientPointerSource.GetForWindowId(new((ulong)w.Handle));
+        //};
+
         InitAsync();
     }
     private async void InitAsync()
@@ -47,7 +58,8 @@ public partial class MainWindow : Window
         try
         {
             aw.TitleBar.ExtendsContentIntoTitleBar = true;
-        } catch
+        }
+        catch
         {
             // API not avaliable
         }
@@ -69,7 +81,8 @@ public partial class MainWindow : Window
                     w.DwmAttribute.Set(DwmWindowAttribute.DWMWA_USE_IMMERSIVE_DARK_MODE, 0);
                     aw.TitleBar.ButtonBackgroundColor = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                 }
-            } catch
+            }
+            catch
             {
                 // API not avaliable, ignore
             }
@@ -92,10 +105,13 @@ public partial class MainWindow : Window
         {
             // system backdrop not supported
         }
-
-        await webView.EnsureCoreWebView2Async();
+        var env = await CoreWebView2Environment.CreateAsync(options: new()
+        {
+            AdditionalBrowserArguments = "--flag-switches-begin --enable-features=AIPromptAPI --flag-switches-end",
+            ScrollBarStyle = CoreWebView2ScrollbarStyle.FluentOverlay
+        });
+        await webView.EnsureCoreWebView2Async(env);
         webView.CoreWebView2.Settings.UserAgent = $"SimplyTools/Windows {webView.CoreWebView2.Settings.UserAgent}";
-        webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
         webView.CoreWebView2.Settings.IsZoomControlEnabled = false;
         webView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
         webView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false;
@@ -103,13 +119,24 @@ public partial class MainWindow : Window
         webView.CoreWebView2.Settings.IsPinchZoomEnabled = false;
         webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
 #if !DEBUG
+        webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
         webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
 #endif
         Directory.SetCurrentDirectory(Package.Current.InstalledLocation.Path);
-        webView.CoreWebView2.SetVirtualHostNameToFolderMapping("SimplyTools.local",
+        webView.CoreWebView2.SetVirtualHostNameToFolderMapping("simplytools.local",
             "./Assets/web",
             CoreWebView2HostResourceAccessKind.Allow);
-        webView.CoreWebView2.Navigate("http://SimplyTools.local/index.html");
+#if DEBUG
+        webView.CoreWebView2.Navigate("http://localhost:3000");
+        //webView.CoreWebView2.Navigate("edge://flags");
+#else
+        webView.CoreWebView2.Navigate("https://getget99.github.io/SimplyTools");
+#endif
+        webView.CoreWebView2.DocumentTitleChanged += delegate
+        {
+            w.TitleText = webView.CoreWebView2.DocumentTitle;
+        };
+        w.TitleText = webView.CoreWebView2.DocumentTitle;
         webView.NavigationCompleted += async (s, e) =>
         {
             if (e.IsSuccess)
@@ -134,9 +161,125 @@ public partial class MainWindow : Window
                     })()
                     """);
             }
-            else
+            else if (e.HttpStatusCode is 0)
             {
-                // Handle navigation failure
+                var src = webView.CoreWebView2.Source;
+#if DEBUG
+                if (src.StartsWith("http://localhost:3000/"))
+                    webView.CoreWebView2.Navigate($"https://simplytools.local/{src["http://localhost:3000/".Length..]}");
+#endif
+                if (src is "https://simplytools.local/" or "https://simplytools.local")
+                    webView.CoreWebView2.Navigate("https://simplytools.local/index.html");
+                if (src is "https://getget99.github.io/SimplyTools" or "https://getget99.github.io/SimplyTools/")
+                    webView.CoreWebView2.Navigate("https://simplytools.local/index.html");
+                if (src.StartsWith("https://getget99.github.io/SimplyTools/"))
+                    webView.CoreWebView2.Navigate($"https://simplytools.local/{src["https://getget99.github.io/SimplyTools/".Length..]}");
+            }
+        };
+        webView.CoreWebView2.NewWindowRequested += (sender, e) =>
+        {
+            e.Handled = true;
+            Process.Start(new ProcessStartInfo() { FileName = e.Uri, UseShellExecute = true });
+        };
+        webView.WebMessageReceived += (sender, e) =>
+        {
+            if (!e.Source.StartsWith("https://simplytools.local/") && !e.Source.StartsWith("https://getget99.github.io/SimplyTools/")
+             &&
+#if DEBUG
+             !e.Source.StartsWith("http://localhost:3000/")
+#endif
+             )
+            {
+                return;
+            }
+
+            try
+            {
+                var payload = JsonNode.Parse(e.WebMessageAsJson);
+                var API = payload?["$api"];
+                var Request = payload?["$request"];
+                var api = API?.GetValueKind() is not JsonValueKind.String ? null : API.GetValue<string>();
+
+                try
+                {
+                    switch (api)
+                    {
+                        case "titlebar.setDragRegion":
+                            var dragregion = payload!["dragregion"]?.AsArray();
+                            var passthrough = payload!["passthrough"]?.AsArray();
+
+                            if (dragregion is null || passthrough is null)
+                            {
+                                Error("invalid parameters");
+                                return;
+                            }
+
+                            // Convert JSON arrays to RectInt32[]
+                            var dr = new RectInt32[dragregion.Count];
+                            for (int i = 0; i < dragregion.Count; i++)
+                            {
+                                var reg = dragregion[i]?.AsArray();
+                                if (reg == null || reg.Count != 4)
+                                {
+                                    ErrorInvalidArguments();
+                                    return;
+                                }
+                                dr[i] = new RectInt32(
+                                    reg[0]?.GetValue<int>() ?? 0,
+                                    reg[1]?.GetValue<int>() ?? 0,
+                                    reg[2]?.GetValue<int>() ?? 0,
+                                    reg[3]?.GetValue<int>() ?? 0
+                                );
+                            }
+
+                            var pt = new RectInt32[passthrough.Count];
+                            for (int i = 0; i < passthrough.Count; i++)
+                            {
+                                var reg = passthrough[i]?.AsArray();
+                                if (reg == null || reg.Count != 4)
+                                {
+                                    ErrorInvalidArguments();
+                                    return;
+                                }
+                                pt[i] = new RectInt32(
+                                    reg[0]?.GetValue<int>() ?? 0,
+                                    reg[1]?.GetValue<int>() ?? 0,
+                                    reg[2]?.GetValue<int>() ?? 0,
+                                    reg[3]?.GetValue<int>() ?? 0
+                                );
+                            }
+
+                            // Call the API on InputNonClientPointerSource
+                            //incps.SetRegionRects(NonClientRegionKind.Caption, dr);
+                            //incps.SetRegionRects(NonClientRegionKind.Passthrough, pt);
+                            aw.TitleBar.SetDragRectangles(dr);
+                            break;
+
+                        default:
+                            Error("API not found");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Error($"Internal Error: {ex.Message}");
+                }
+
+                void Error(string message)
+                {
+                    if (Request == null) return;
+                    webView.CoreWebView2.PostWebMessageAsJson($$"""
+                    {
+                        "$request": {{Request.ToJsonString()}},
+                        "error": "{{message}}"
+                    }
+                    """);
+                }
+
+                void ErrorInvalidArguments() => Error("Invalid Arguments");
+            } catch
+            {
+
             }
         };
         uisettings.ColorValuesChanged += delegate
@@ -144,4 +287,5 @@ public partial class MainWindow : Window
             UpdateTheme();
         };
     }
+    InputNonClientPointerSource incps;
 }

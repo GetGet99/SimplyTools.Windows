@@ -1,0 +1,1 @@
+@keyframes jump{0%{transform:translateY(0)}20%{transform:translateY(-14px)}35%{transform:translateY(-11px)}55%{transform:translateY(2px)}70%{transform:translateY(-6px)}90%{transform:translateY(0)}to{transform:translateY(0)}}.jumping{animation:jump .25s cubic-bezier(.39,.69,.3,1.46)}

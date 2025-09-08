@@ -1,0 +1,57 @@
+{%- meta -%}
+name: Dependency Property Generator
+description: Generate dependency properties, commonly used for platforms like WPF, WinUI, and UWP.
+lang: csharp
+properties:
+  partial: boolean
+  usings: string[]
+  DependencyPropertyClassName: string
+  name: string
+  props:
+    type: string
+    name: string
+example:
+  namespace: SimplyTools.Example
+  name: Person
+  partial: true
+  DependencyPropertyClassName: DependencyProperty
+  usings:
+    - Microsoft.UI.Xaml
+    - Windows.UI.Xaml
+  props:
+    - type: string
+      name: FirstName
+    - type: string
+      name: LastName
+    - type: int
+      name: Age
+{%- endmeta -%}
+{%- unless DependencyPropertyClassName -%}
+    {% assign DependencyPropertyClassName = "DependencyProperty" %}
+{%- endunless -%}
+{%- for using in usings -%}
+    using {{using}};
+{% endfor -%}
+{%- if namespace -%} namespace {{ namespace }} { {%- endif %}
+    {% if partial %}partial {% endif %}class {{name}} {
+        {%- for prop in props %}
+        public static readonly {{ DependencyPropertyClassName }} {{prop.name}}Property =
+            {{ DependencyPropertyClassName }}.Register(
+                {{prop.name}},
+                typeof({{prop.type}}),
+                typeof({{name}}),
+                null
+            );
+
+        public {{prop.type}} {{prop.name}}
+        {
+            get {
+                return ({{prop.type}})GetValue({{prop.name}}Property);
+            }
+            set {
+                SetValue({{prop.name}}Property, value);
+            }
+        }
+        {% endfor %}
+    }
+{% if namespace -%} } {%- endif -%}

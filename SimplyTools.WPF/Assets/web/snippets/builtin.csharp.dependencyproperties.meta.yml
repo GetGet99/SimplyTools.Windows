@@ -1,0 +1,31 @@
+name: Dependency Property Generator
+description: Generate dependency properties, commonly used for platforms like WPF, WinUI, and UWP.
+lang: csharp
+properties:
+  # Whether to include the partial keyword (default: false)
+  partial: boolean
+  # List of using namespaces
+  usings: string[]
+  # DependencyProperty class name (defaults to "DependencyProperty")
+  DependencyPropertyClassName: string
+  # Class name
+  name: string
+  # Properties to generate
+  props:
+    type: string
+    name: string
+example:
+  namespace: SimplyTools.Example
+  name: Person
+  partial: true
+  DependencyPropertyClassName: DependencyProperty
+  usings:
+    - Microsoft.UI.Xaml
+    - Windows.UI.Xaml
+  props:
+    - type: string
+      name: FirstName
+    - type: string
+      name: LastName
+    - type: int
+      name: Age

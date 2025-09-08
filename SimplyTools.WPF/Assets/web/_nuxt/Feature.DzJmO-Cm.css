@@ -1,0 +1,1 @@
+/*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */body.app .feature-root{grid-template-rows:0 minmax(0,1fr)}.feature-root:not(body.app *){grid-template-rows:0 auto minmax(0,1fr) auto}
