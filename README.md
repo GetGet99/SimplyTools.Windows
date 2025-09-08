@@ -2,7 +2,7 @@
 
 [SimplyTools](https://getget99.github.io/SimplyTools/), but is a windowed application. Works while being offline.
 
-## Web Apps, Reimagined
+## Progressive Web App, Reimagined
 
 Web apps do not have to look out of place in Windows. With some effort, it can look integrated into the OS. SimplyTools on Windows respects system accent color and windows theme. On Windows 11, it also has access to Mica Material.
 
