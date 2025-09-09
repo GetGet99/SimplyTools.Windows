@@ -7,13 +7,13 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="c65cf879-3ba1-4742-afbe-338583c9f28d"
-    Publisher="CN=getdn"
+    Name="3749Get.3338904DFEBD4"
+    Publisher="CN=95122495-0FC5-4CBE-B461-D28358AFE57A"
     Version="1.0.0.0" />
 
   <Properties>
-    <DisplayName>SimplyTools.Packager</DisplayName>
-    <PublisherDisplayName>getdn</PublisherDisplayName>
+    <DisplayName>SimplyTools</DisplayName>
+    <PublisherDisplayName>Get</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
 

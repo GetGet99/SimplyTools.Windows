@@ -1,0 +1,2 @@
+MainPackage=D:\Programming\VS\SimplyTools\SimplyTools.Packager\bin\x86\Release\SimplyTools.Packager_1.0.0.0_x86.msix
+SymbolPackage=D:\Programming\VS\SimplyTools\SimplyTools.Packager\obj\x86\Release\Symbols\SimplyTools.Packager_1.0.0.0_x86.appxsym

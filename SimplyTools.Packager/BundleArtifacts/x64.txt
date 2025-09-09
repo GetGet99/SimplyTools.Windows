@@ -1,0 +1,6 @@
+MainPackage=D:\Programming\VS\SimplyTools\SimplyTools.Packager\bin\x64\Release\SimplyTools.Packager_1.0.0.0_x64.msix
+SymbolPackage=D:\Programming\VS\SimplyTools\SimplyTools.Packager\obj\x64\Release\Symbols\SimplyTools.Packager_1.0.0.0_x64.appxsym
+ResourcePack=D:\Programming\VS\SimplyTools\SimplyTools.Packager\bin\x64\Release\SimplyTools.Packager_1.0.0.0_scale-100.msix
+ResourcePack=D:\Programming\VS\SimplyTools\SimplyTools.Packager\bin\x64\Release\SimplyTools.Packager_1.0.0.0_scale-125.msix
+ResourcePack=D:\Programming\VS\SimplyTools\SimplyTools.Packager\bin\x64\Release\SimplyTools.Packager_1.0.0.0_scale-150.msix
+ResourcePack=D:\Programming\VS\SimplyTools\SimplyTools.Packager\bin\x64\Release\SimplyTools.Packager_1.0.0.0_scale-400.msix

@@ -184,8 +184,8 @@ public partial class MainWindow : Window
         webView.WebMessageReceived += (sender, e) =>
         {
             if (!e.Source.StartsWith("https://simplytools.local/") && !e.Source.StartsWith("https://getget99.github.io/SimplyTools/")
-             &&
 #if DEBUG
+             &&
              !e.Source.StartsWith("http://localhost:3000/")
 #endif
              )

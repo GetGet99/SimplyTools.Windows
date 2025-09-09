@@ -9,5 +9,9 @@
     <AppIconSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</AppIconSource>
     <SplashScreenSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</SplashScreenSource>
     <PackageLogoSource>E:\.SysFolder\Downloads\SimplyToolsIcon1.png</PackageLogoSource>
+    <UapAppxPackageBuildMode>StoreAndSideload</UapAppxPackageBuildMode>
+    <AppxShowAllApps>False</AppxShowAllApps>
+    <AppxBuildConfigurationSelection>x64</AppxBuildConfigurationSelection>
+    <PackageOptionalProjectsInIdeBuilds>False</PackageOptionalProjectsInIdeBuilds>
   </PropertyGroup>
 </Project>
