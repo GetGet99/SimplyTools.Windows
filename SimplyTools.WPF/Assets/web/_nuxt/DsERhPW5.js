@@ -1,1 +1,0 @@
-import{ae as n}from"./CfbvuZjT.js";function o(){let e=document.activeElement;if(e==null)return null;for(;e!=null&&e.shadowRoot!=null&&e.shadowRoot.activeElement!=null;)e=e.shadowRoot.activeElement;return e}function u(e,t="reka"){return`${t}-${n?.()}`}export{o as g,u};

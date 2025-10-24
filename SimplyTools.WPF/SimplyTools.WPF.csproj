@@ -9,16 +9,17 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
 		<Platforms>AnyCPU;x64</Platforms>
+		<GenerateResourcePriFile>false</GenerateResourcePriFile>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Assets\SimplyToolsIcon1.ico" />
+		<None Remove="Assets\SimplyToolsIcon1.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include="Assets\SimplyToolsIcon1.ico">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
+		<Content Include="Assets\SimplyToolsIcon1.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -30,8 +31,14 @@
 		<PackageReference Include="WinWrapper.Windowing" Version="2.0.2" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="Assets\web\**">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+		<None Update="Assets\web\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<ExcludeFromPRIResource>true</ExcludeFromPRIResource>
+		</None>
+		<None Include="Assets\web\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<ExcludeFromPRIResource>true</ExcludeFromPRIResource>
+		</None>
+		<Content Remove="Assets\web\**"/>
 	</ItemGroup>
 </Project>

@@ -66,34 +66,34 @@
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-		<AppxBundle>Always</AppxBundle>
+		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<ItemGroup>
 		<AppxManifest Include="Package.appxmanifest">
@@ -157,6 +157,9 @@
 	<Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2535.41">
+		</PackageReference>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230822000" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\SimplyTools.WPF\SimplyTools.WPF.csproj" />

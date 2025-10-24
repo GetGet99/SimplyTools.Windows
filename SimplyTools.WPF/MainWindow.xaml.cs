@@ -4,6 +4,7 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Web;
@@ -107,7 +108,7 @@ public partial class MainWindow : Window
         }
         var env = await CoreWebView2Environment.CreateAsync(options: new()
         {
-            AdditionalBrowserArguments = "--flag-switches-begin --enable-features=AIPromptAPI --flag-switches-end",
+            AdditionalBrowserArguments = "--enable-features=AIPromptAPI,AIRewriterAPI,AISummarizationAPI,AIWriterAPI,OnDeviceModelPerformanceParams:compatible_on_device_performance_classes/%2A",
             ScrollBarStyle = CoreWebView2ScrollbarStyle.FluentOverlay
         });
         await webView.EnsureCoreWebView2Async(env);
@@ -152,6 +153,8 @@ public partial class MainWindow : Window
                         s.innerHTML = `
                         body.app {
                             --app-titlebar-height: {{aw.TitleBar.Height}}px;
+                            --app-titlebar-reserved-area-left: {{aw.TitleBar.LeftInset}}px;
+                            --app-titlebar-reserved-area-right: {{aw.TitleBar.RightInset}}px;
                             --color-accent: rgba({{accent.R}}, {{accent.G}}, {{accent.B}}, {{accent.A}});
                             --color-accent-light-1: rgba({{accentlight1.R}}, {{accentlight1.G}}, {{accentlight1.B}}, {{accentlight1.A}});
                             --color-accent-light-2: rgba({{accentlight2.R}}, {{accentlight2.G}}, {{accentlight2.B}}, {{accentlight2.A}});
@@ -164,15 +167,16 @@ public partial class MainWindow : Window
             else if (e.HttpStatusCode is 0)
             {
                 var src = webView.CoreWebView2.Source;
+                webView.CoreWebView2.Stop();
 #if DEBUG
                 if (src.StartsWith("http://localhost:3000/"))
                     webView.CoreWebView2.Navigate($"https://getget99.github.io/SimplyTools/{src["http://localhost:3000/".Length..]}");
 #endif
                 if (src is "https://simplytools.local/" or "https://simplytools.local")
                     webView.CoreWebView2.Navigate("https://simplytools.local/index.html");
-                if (src is "https://getget99.github.io/SimplyTools" or "https://getget99.github.io/SimplyTools/")
+                else if (src is "https://getget99.github.io/SimplyTools" or "https://getget99.github.io/SimplyTools/")
                     webView.CoreWebView2.Navigate("https://simplytools.local/index.html");
-                if (src.StartsWith("https://getget99.github.io/SimplyTools/"))
+                else if (src.StartsWith("https://getget99.github.io/SimplyTools/"))
                     webView.CoreWebView2.Navigate($"https://simplytools.local/{src["https://getget99.github.io/SimplyTools/".Length..]}");
             }
         };
@@ -181,6 +185,7 @@ public partial class MainWindow : Window
             e.Handled = true;
             Process.Start(new ProcessStartInfo() { FileName = e.Uri, UseShellExecute = true });
         };
+        //var incps = InputNonClientPointerSource.GetForWindowId(new((ulong)w.Handle));
         webView.WebMessageReceived += (sender, e) =>
         {
             if (!e.Source.StartsWith("https://simplytools.local/") && !e.Source.StartsWith("https://getget99.github.io/SimplyTools/")
@@ -204,13 +209,26 @@ public partial class MainWindow : Window
                 {
                     switch (api)
                     {
+                        case "features.isAvaliable":
+                            var feature = payload!["feature"]?.GetValue<string>();
+                            switch (feature)
+                            {
+                                case "features.isAvaliable":
+                                case "titlebar.setDragRegion":
+                                    ResultJSON("true");
+                                    break;
+                                default:
+                                    ResultJSON("false");
+                                    break;
+                            }
+                            break;
                         case "titlebar.setDragRegion":
                             var dragregion = payload!["dragregion"]?.AsArray();
                             var passthrough = payload!["passthrough"]?.AsArray();
 
                             if (dragregion is null || passthrough is null)
                             {
-                                Error("invalid parameters");
+                                ErrorInvalidArguments();
                                 return;
                             }
 
@@ -265,6 +283,28 @@ public partial class MainWindow : Window
                     Error($"Internal Error: {ex.Message}");
                 }
 
+                void ResultString(string message)
+                {
+                    if (Request == null) return;
+                    webView.CoreWebView2.PostWebMessageAsJson($$"""
+                    {
+                        "$request": {{Request.ToJsonString()}},
+                        "error": "{{message}}"
+                    }
+                    """);
+                }
+
+                void ResultJSON(string json)
+                {
+                    if (Request == null) return;
+                    webView.CoreWebView2.PostWebMessageAsJson($$"""
+                    {
+                        "$request": {{Request.ToJsonString()}},
+                        "error": {{json}}
+                    }
+                    """);
+                }
+
                 void Error(string message)
                 {
                     if (Request == null) return;
@@ -277,7 +317,8 @@ public partial class MainWindow : Window
                 }
 
                 void ErrorInvalidArguments() => Error("Invalid Arguments");
-            } catch
+            }
+            catch
             {
 
             }
