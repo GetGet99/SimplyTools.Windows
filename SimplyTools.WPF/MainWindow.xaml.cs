@@ -4,15 +4,14 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Web;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Windows.ApplicationModel;
 using Windows.Graphics;
+using Windows.Storage;
 using Windows.UI.ViewManagement;
 using WinWrapper.Windowing;
 using wv2::Microsoft.Web.WebView2.Core;
@@ -112,7 +111,7 @@ public partial class MainWindow : Window
             ScrollBarStyle = CoreWebView2ScrollbarStyle.FluentOverlay
         });
         await webView.EnsureCoreWebView2Async(env);
-        webView.CoreWebView2.Settings.UserAgent = $"SimplyTools/Windows {webView.CoreWebView2.Settings.UserAgent}";
+        webView.CoreWebView2.Settings.UserAgent = $"SimplyTools/Windows/1.0.2 {webView.CoreWebView2.Settings.UserAgent}";
         webView.CoreWebView2.Settings.IsZoomControlEnabled = false;
         webView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
         webView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false;
@@ -124,9 +123,85 @@ public partial class MainWindow : Window
         webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
 #endif
         Directory.SetCurrentDirectory(Package.Current.InstalledLocation.Path);
-        webView.CoreWebView2.SetVirtualHostNameToFolderMapping("simplytools.local",
-            "./Assets/web",
-            CoreWebView2HostResourceAccessKind.Allow);
+
+        webView.CoreWebView2.AddWebResourceRequestedFilter("https://simplytools.local/*", CoreWebView2WebResourceContext.All);
+
+        webView.CoreWebView2.WebResourceRequested += (sender, args) =>
+        {
+            try
+            {
+                var requestUri = new Uri(args.Request.Uri);
+                if (!requestUri.Scheme.StartsWith("http")) return;
+                if (!requestUri.Host.Equals("simplytools.local", StringComparison.OrdinalIgnoreCase)) return;
+                var relative = requestUri.AbsolutePath ?? "/";
+                if (string.IsNullOrEmpty(relative) || relative == "/")
+                    relative = "/index.html";
+
+                relative = relative.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+
+                var baseFolder = Path.Combine(Package.Current.InstalledLocation.Path, "SimplyTools.WPF", "Assets", "web");
+                var localPath = Path.Combine(baseFolder, relative);
+
+                bool exists = File.Exists(localPath);
+                if (!exists)
+                {
+                    var notFound = Path.Combine(baseFolder, "404.html");
+                    if (File.Exists(notFound))
+                    {
+                        localPath = notFound;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+
+                string GetContentType(string file)
+                {
+                    var ext = Path.GetExtension(file).ToLowerInvariant();
+                    return ext switch
+                    {
+                        ".html" or ".htm" => "text/html; charset=utf-8",
+                        ".js" => "application/javascript; charset=utf-8",
+                        ".css" => "text/css; charset=utf-8",
+                        ".json" => "application/json; charset=utf-8",
+                        ".png" => "image/png",
+                        ".jpg" or ".jpeg" => "image/jpeg",
+                        ".svg" => "image/svg+xml",
+                        ".gif" => "image/gif",
+                        ".ico" => "image/x-icon",
+                        ".woff" => "font/woff",
+                        ".woff2" => "font/woff2",
+                        ".ttf" => "font/ttf",
+                        ".eot" => "application/vnd.ms-fontobject",
+                        _ => "application/octet-stream",
+                    };
+                }
+
+                var contentType = GetContentType(localPath);
+
+                Stream fileStream;
+                try
+                {
+                    fileStream = File.OpenRead(localPath);
+                }
+                catch
+                {
+                    return;
+                }
+
+                var environment = env ?? webView.CoreWebView2.Environment;
+                var statusCode = exists ? 200 : 404;
+                var reason = exists ? "OK" : "Not Found";
+                var headers = $"Content-Type: {contentType}\r\n";
+
+                args.Response = environment.CreateWebResourceResponse(fileStream, statusCode, reason, headers);
+            }
+            catch
+            {
+            }
+        };
+
 #if DEBUG
         webView.CoreWebView2.Navigate("http://localhost:3000");
         //webView.CoreWebView2.Navigate("edge://flags");
@@ -180,6 +255,10 @@ public partial class MainWindow : Window
                     webView.CoreWebView2.Navigate($"https://simplytools.local/{src["https://getget99.github.io/SimplyTools/".Length..]}");
             }
         };
+
+
+
+
         webView.CoreWebView2.NewWindowRequested += (sender, e) =>
         {
             e.Handled = true;
@@ -215,11 +294,33 @@ public partial class MainWindow : Window
                             {
                                 case "features.isAvaliable":
                                 case "titlebar.setDragRegion":
+                                case "navigation.edge.flags":
+                                case "storage.keyval":
+                                case "storage.keyval.get":
+                                case "storage.keyval.store":
                                     ResultJSON("true");
                                     break;
                                 default:
                                     ResultJSON("false");
                                     break;
+                            }
+                            break;
+                        case "navigation.edge.flags":
+                            webView.CoreWebView2.Navigate("edge://flags");
+                            break;
+                        case "storage.keyval.get":
+                            {
+                                var key = payload!["key"]?.GetValue<string>();
+                                var value = payload!["value"];
+                                ResultJSON((ApplicationData.Current.LocalSettings.Values[$"web.{key}"] as string) ?? "null");
+                            }
+                            break;
+                        case "storage.keyval.store":
+                            {
+                                var key = payload!["key"]?.GetValue<string>();
+                                var value = payload!["value"];
+                                ApplicationData.Current.LocalSettings.Values[$"web.{key}"] = value?.ToJsonString();
+                                ResultJSON("ok");
                             }
                             break;
                         case "titlebar.setDragRegion":
@@ -289,7 +390,7 @@ public partial class MainWindow : Window
                     webView.CoreWebView2.PostWebMessageAsJson($$"""
                     {
                         "$request": {{Request.ToJsonString()}},
-                        "error": "{{message}}"
+                        "result": "{{message}}"
                     }
                     """);
                 }
@@ -300,7 +401,7 @@ public partial class MainWindow : Window
                     webView.CoreWebView2.PostWebMessageAsJson($$"""
                     {
                         "$request": {{Request.ToJsonString()}},
-                        "error": {{json}}
+                        "result": {{json}}
                     }
                     """);
                 }
