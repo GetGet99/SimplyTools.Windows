@@ -119,8 +119,11 @@ public partial class MainWindow : Window
         webView.CoreWebView2.Settings.IsPinchZoomEnabled = false;
         webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
 #if !DEBUG
-        webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
-        webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+        if (!(bool)(ApplicationData.Current.LocalSettings.Values[$"devtools.isEnabled"] ?? false))
+        {
+            webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
+            webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+        }
 #endif
         Directory.SetCurrentDirectory(Package.Current.InstalledLocation.Path);
 
@@ -298,6 +301,8 @@ public partial class MainWindow : Window
                                 case "storage.keyval":
                                 case "storage.keyval.get":
                                 case "storage.keyval.store":
+                                case "devtools.isEnabled":
+                                case "devtools.setEnabled":
                                     ResultJSON("true");
                                     break;
                                 default:
@@ -320,6 +325,18 @@ public partial class MainWindow : Window
                                 var key = payload!["key"]?.GetValue<string>();
                                 var value = payload!["value"];
                                 ApplicationData.Current.LocalSettings.Values[$"web.{key}"] = value?.ToJsonString();
+                                ResultJSON("ok");
+                            }
+                            break;
+                        case "devtools.isEnabled":
+                            ResultJSON((bool)(ApplicationData.Current.LocalSettings.Values[$"devtools.isEnabled"] ?? false) ? "true" : "false");
+                            break;
+                        case "devtools.setEnabled":
+                            {
+                                var isDevtoolsEnabled = payload!["value"]?.GetValue<bool>() ?? false;
+                                ApplicationData.Current.LocalSettings.Values[$"devtools.isEnabled"] = isDevtoolsEnabled;
+                                webView.CoreWebView2.Settings.IsStatusBarEnabled = isDevtoolsEnabled;
+                                webView.CoreWebView2.Settings.AreDevToolsEnabled = isDevtoolsEnabled;
                                 ResultJSON("ok");
                             }
                             break;
