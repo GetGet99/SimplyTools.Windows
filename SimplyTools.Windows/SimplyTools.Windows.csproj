@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Platforms>AnyCPU;x64</Platforms>
+		<GenerateResourcePriFile>false</GenerateResourcePriFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Assets\SimplyToolsIcon1.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Assets\SimplyToolsIcon1.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2535.41">
+			<Aliases>wv2</Aliases>
+		</PackageReference>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230822000" />
+		<PackageReference Include="WinWrapper.Windowing" Version="2.0.5" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.2-beta">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="Assets\web\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<ExcludeFromPRIResource>true</ExcludeFromPRIResource>
+		</None>
+		<None Include="Assets\web\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<ExcludeFromPRIResource>true</ExcludeFromPRIResource>
+		</None>
+		<Content Remove="Assets\web\**" />
+	</ItemGroup>
+</Project>

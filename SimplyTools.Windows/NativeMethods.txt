@@ -1,0 +1,10 @@
+﻿PostQuitMessage
+BeginPaint
+EndPaint
+RegisterWindowMessage
+
+DwmExtendFrameIntoClientArea
+
+HRESULT
+
+GetStockObject

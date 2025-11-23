@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SimplyTools.Windows": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
