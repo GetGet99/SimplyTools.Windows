@@ -3,8 +3,8 @@ description: Example Snippet
 properties:
   customer_name: string
   order_items:
-    - name: string
-      price: number
+    name: string
+    price: number
   total_price: number
 example:
   customer_name: Alice

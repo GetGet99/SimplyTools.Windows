@@ -2,18 +2,18 @@ name: INotifyPropertyChanged Generator
 description: Generate INotifyPropertyChanged class
 lang: csharp
 properties:
-  # Whether to use C# 14 `field` keyword rather than generating backing field (default: false)
-  fieldKeyword: boolean
-  # Whether to include the partial keyword (default: false)
-  partial: boolean
-  # List of using namespaces
-  usings: string[]
   # Class name
   name: string
   # Properties to generate
   props:
     type: string
     name: string
+  # Whether to use C# 14 `field` keyword rather than generating backing field
+  fieldKeyword: boolean
+  # Whether to include the partial keyword (default: false)
+  partial: boolean
+  # List of using namespaces
+  usings: string[]
 example:
   namespace: SimplyTools.Example
   name: Person

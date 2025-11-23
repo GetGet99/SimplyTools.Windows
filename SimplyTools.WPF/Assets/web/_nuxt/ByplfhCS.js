@@ -1,1 +1,0 @@
-import{r as t}from"./BGAVzX23.js";const e=t("dark");if(window?.matchMedia){let a=function(c){e.value=c.matches?"dark":"light"};const r=window.matchMedia("(prefers-color-scheme: dark)");e.value=r.matches?"dark":"light",r.addEventListener("change",a)}function n(){return e}export{n as u};
